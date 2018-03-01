@@ -1,0 +1,2 @@
+node_modules/navalia/build/util/chrome.js -> 'info' to 'silent'
+node_modules/lighthouse-logger/index.js -> wtf

@@ -1,0 +1,18 @@
+{
+  "name": "kju",
+  "version": "0.0.2",
+  "description": "ADC HMAC Extractor",
+  "main": "index.js",
+  "author": "bequadro",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "beeper": "^1.1.1",
+    "copy-paste": "^1.3.0",
+    "keypress": "^0.2.1",
+    "listr": "^0.13.0",
+    "navalia": "1.2.0",
+    "node-notifier": "^5.1.2",
+    "rxjs": "^5.5.6"
+  }
+}
