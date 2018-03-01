@@ -1,3 +1,12 @@
+const CONFIG = {
+	splashURL: 'http://www.adidas.de/yeezy',
+	splashURL: 'http://w.www.adidas.de/hmac',
+	instances: 2,
+	headless: false,
+	reload: true,
+	timeout: 20
+};
+
 const USER_AGENTS = [
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
 	"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
@@ -19,164 +28,7 @@ const USER_AGENTS = [
 	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
 ];
 
-// mail.google.com
-const GOOGLE_COOKIES = [
-	{
-		"domain": ".google.com",
-		"expirationDate": 1514143464,
-		"hostOnly": false,
-		"httpOnly": false,
-		"name": "1P_JAR",
-		"path": "/",
-		"sameSite": "no_restriction",
-		"secure": false,
-		"session": false,
-		"storeId": "0",
-		"value": "2017-11-24-19",
-		"id": 1
-	},
-	{
-		"domain": ".google.com",
-		"expirationDate": 1574427551.390347,
-		"hostOnly": false,
-		"httpOnly": false,
-		"name": "APISID",
-		"path": "/",
-		"sameSite": "no_restriction",
-		"secure": false,
-		"session": false,
-		"storeId": "0",
-		"value": "JWHjTlO7jBlaCsKI/A1He_eXKOsr3BmUTQ",
-		"id": 2
-	},
-	{
-		"domain": ".google.com",
-		"expirationDate": 1574427551.390155,
-		"hostOnly": false,
-		"httpOnly": true,
-		"name": "HSID",
-		"path": "/",
-		"sameSite": "no_restriction",
-		"secure": false,
-		"session": false,
-		"storeId": "0",
-		"value": "A-IIlhh8GwGkqHX7a",
-		"id": 3
-	},
-	{
-		"domain": ".google.com",
-		"expirationDate": 1527361630.208673,
-		"hostOnly": false,
-		"httpOnly": true,
-		"name": "NID",
-		"path": "/",
-		"sameSite": "no_restriction",
-		"secure": false,
-		"session": false,
-		"storeId": "0",
-		"value": "118=h0a467Mf-VFmXUlfqtncX5EbxqI_Ad_0SM7h8EtGRoKmgILPCRuEfJNKsTGkqLsMhynoBTwoyRN6IMN9cHL8RAy76HHwo3NlAegLiQKPHyhKCv4U8ow3uMC4bp1qhz_full3xZiu9cCL_bOINqKLcjsRS5cYEe9-WINO5UPstys3k-bV9iSncRk",
-		"id": 4
-	},
-	{
-		"domain": ".google.com",
-		"expirationDate": 1574427551.390444,
-		"hostOnly": false,
-		"httpOnly": false,
-		"name": "SAPISID",
-		"path": "/",
-		"sameSite": "no_restriction",
-		"secure": true,
-		"session": false,
-		"storeId": "0",
-		"value": "Ofav1CAAfQjMFl0D/AbrnwhOqcaKkn3cpw",
-		"id": 5
-	},
-	{
-		"domain": ".google.com",
-		"expirationDate": 1574427551.389821,
-		"hostOnly": false,
-		"httpOnly": false,
-		"name": "SID",
-		"path": "/",
-		"sameSite": "no_restriction",
-		"secure": false,
-		"session": false,
-		"storeId": "0",
-		"value": "cAXO5PHSjIPu91Vhi-ub6jSH4Hi6qE5drjiQgkS_MMNaXbM59ZDB0NGjg5UYklh23K7CAg.",
-		"id": 6
-	},
-	{
-		"domain": ".google.com",
-		"expirationDate": 1519327494.186245,
-		"hostOnly": false,
-		"httpOnly": false,
-		"name": "SIDCC",
-		"path": "/",
-		"sameSite": "no_restriction",
-		"secure": false,
-		"session": false,
-		"storeId": "0",
-		"value": "AE4kn7-LRlnG8DJiu2kdhlm4SeekjVQzqB8nwQZRoEVIy46qrwzjzOhJ4TtBlKYkZyRic7fPM2X5p_ccJSY",
-		"id": 7
-	},
-	{
-		"domain": ".google.com",
-		"expirationDate": 1574427551.390252,
-		"hostOnly": false,
-		"httpOnly": true,
-		"name": "SSID",
-		"path": "/",
-		"sameSite": "no_restriction",
-		"secure": true,
-		"session": false,
-		"storeId": "0",
-		"value": "AHMY7rBsd0I0QXpfL",
-		"id": 8
-	},
-	{
-		"domain": "mail.google.com",
-		"expirationDate": 1512414478.565285,
-		"hostOnly": true,
-		"httpOnly": true,
-		"name": "COMPASS",
-		"path": "/mail/u/0",
-		"sameSite": "no_restriction",
-		"secure": true,
-		"session": false,
-		"storeId": "0",
-		"value": "gmail=CmQACWuJV67Z6eXbJZKrIuxOxfrwUkSfFhSz8ghkaxr8GZM3Ds6RwO6gUcMC0eDN1wdLqt_EewxGbqnzhimPBeF9Uk6NDvM-JsF-zaOVSiBEj4_lgHb-hAAm28oWCcQiImR_m-UAENT44dAFGm0ACWuJV7dMDHEuEYpW6x_Y5L9AIFU94i1reKnYyXqrKvV2xDr9hPVGz6ASXtb335JmVbmRhZUXARQGm-8aKMuVHcmIfFk8csviM4hjWA9J_YM5E5MEdgscv6Gc1LQhYHqrjKcOuylPVaFrtjzm",
-		"id": 9
-	},
-	{
-		"domain": "mail.google.com",
-		"hostOnly": true,
-		"httpOnly": false,
-		"name": "GMAIL_AT",
-		"path": "/mail/u/0",
-		"sameSite": "no_restriction",
-		"secure": true,
-		"session": true,
-		"storeId": "0",
-		"value": "AF6bupN2v9Ukk9OTikdujKN_Ceq3KL8MIA",
-		"id": 10
-	},
-	{
-		"domain": "mail.google.com",
-		"expirationDate": 1574427560.363483,
-		"hostOnly": true,
-		"httpOnly": true,
-		"name": "OSID",
-		"path": "/",
-		"sameSite": "no_restriction",
-		"secure": true,
-		"session": false,
-		"storeId": "0",
-		"value": "cAXO5Dm1YlExkwWbfNHVkp3MNs2uFBrFPdS-cQbYFT__dCc4TIJju19uRvIhvPq9HQTggA.",
-		"id": 11
-	}
-];
-
 module.exports = {
-	USER_AGENTS,
-	GOOGLE_COOKIES
-}
+	CONFIG,
+	USER_AGENTS
+};

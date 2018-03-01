@@ -1,40 +1,34 @@
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs-extra');
 
-const Listr = require('listr');
-//const Rx = require('rxjs/Rx');
 const { Chrome } = require('navalia');
+const notifier = require('node-notifier');
 
-const clipboard = require('copy-paste');
-const { NotificationCenter } = require('node-notifier');
-
-const { USER_AGENTS, GOOGLE_COOKIES } = require('./config');
+const Logger = require('./logger');
 const utils = require('./utils');
+const { CONFIG, USER_AGENTS } = require('./config');
+const GOOGLE_COOKIES = require('./cookies');
 
-const tasks = new Listr([], {
-	concurrent: true
-});
-const notifier = new NotificationCenter();
+const logger = new Logger();
+logger.intro(CONFIG.instances);
 
-const splash = (task, options) => {
+const splash = async (instance, config) => {
 
-	return new Promise(async (resolve, reject) => {
-
-		try {
+	try {
 	
 		let userAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
 
 		let chrome = new Chrome({
 			timeout: 60000,
 			flags: {
-				'headless': options.headless,
+				'headless': config.headless,
 				'disableSync': true,
 				'disable-infobars': true,
 				'disable-web-security': true,
 				'window-size': '400,300',
 				'user-agent': userAgent,
-				'user-data-dir': path.resolve('tmp', 'chrome_' + options.index),
-				'profile-directory': 'PROFILE_' + options.index
+				'user-data-dir': path.resolve('tmp', 'chrome_' + instance),
+				'profile-directory': 'PROFILE_' + instance
 			},
 		});
 
@@ -50,12 +44,12 @@ const splash = (task, options) => {
 			await chrome.cookie(cookie.name, cookie.value);
 		}
 
-		await chrome.goto(options.splashURL);
+		await chrome.goto(config.splashURL);
 
 		while (!(await thruSplash())) {
-			task.output = await chrome.evaluate(() => document.title);
-			await chrome.wait(options.timeout * 1000);
-			if (options.reload) await chrome.goto(options.splashURL);
+			logger.info(instance, await chrome.evaluate(() => document.title));
+			await chrome.wait(config.timeout * 1000);
+			if (config.reload) await chrome.goto(config.splashURL);
 		}
 
 		let cookieJar = await chrome.cookie();
@@ -67,49 +61,31 @@ const splash = (task, options) => {
 		}
 
 		let saveDir = path.resolve('html', Date.now().toString());
-		fs.mkdirSync(saveDir);
-		await chrome.save(saveDir + '/index.html');
-		fs.writeFileSync(saveDir + '/cookies.json', JSON.stringify(cookieJar));
-		fs.writeFileSync(saveDir + '/ua.txt', userAgent);
+		await fs.ensureDir(saveDir);
 
-		task.title = task.title + ': ' + gceeqs || 'Through splash, unknown cookie.'
-		task.output = userAgent;
-		resolve();
+		await chrome.save(path.resolve(saveDir, 'index.html'));
+		await fs.outputFile(path.resolve(saveDir, 'cookies.json'), JSON.stringify(cookieJar));
+		await fs.outputFile(path.resolve(saveDir, 'ua.txt'), userAgent);
+		await fs.outputFile(path.resolve(saveDir, 'body.png'), await chrome.screenshot('body'));
+
+		logger.success(instance, gceeqs, userAgent)
 
 		notifier.notify({
-			title: 'KJU',
-			subtitle: 'HMAC found.',
-			contentImage: path.resolve('icon.png'),
-			message: gceeqs || 'Through splash.',
+			title: '❯❯❯_ Kju',
+			icon: path.resolve('icon.png'),
+			contentImage: path.resolve(saveDir, 'body.png'),
+			message: `Through Splash on Instance ${instance}!`,
 			sound: 'Hero',
-			actions: ['Copy'],
-			timeout: 600
-		}, (err, action, res) => {
-			if (!err) clipboard.copy(gceeqs + ' ' + options.userAgent);
 		});
 	
-		} catch (err) { reject(err) }	
-		
-	});
+	} catch (err) {
+
+		logger.error(instance, err);
+
+	}
 
 }
 
-for (let i = 1; i <= 20; i++) {
-	tasks.add({
-		title: `Instance ${i.pad()}`,
-		task: (ctx, task) => {
-			return splash(task, {
-				index: i.pad(),
-				headless: false,
-				reload: true,
-				timeout: 20,
-				//splashURL: 'http://www.adidas.de/yeezy',
-				splashURL: 'http://w.www.adidas.de/hmac',
-			});
-		}
-	});
+for (let i = 1; i <= CONFIG.instances; i++) {
+	splash(i.pad(), CONFIG);
 }
-
-tasks.run().catch(err => {
-	console.error(err);
-});

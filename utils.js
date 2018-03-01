@@ -1,5 +1,5 @@
 process.setMaxListeners(0);
-require('events').EventEmitter.defaultMaxListeners = 100;
+require('events').EventEmitter.defaultMaxListeners = 1000;
 
 Number.prototype.pad = function (size) {
 	let s = String(this);
