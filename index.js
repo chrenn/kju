@@ -86,6 +86,11 @@ const splash = async (instance, config) => {
 
 }
 
-for (let i = 1; i <= CONFIG.instances; i++) {
-	splash(i.pad(), CONFIG);
+const main = async () => {
+	for (let i = 1; i <= CONFIG.instances; i++) {
+		await utils.timeout(500);
+		splash(i.pad(), CONFIG);
+	}
 }
+
+main();

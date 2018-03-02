@@ -20,10 +20,9 @@ class Logger {
 		process.stdin.on('keypress', function (char, key) {
 			if (key && key.ctrl && key.name == 'c') {
 				process.stdin.setRawMode(false);
-				console.log(chalk.blue('Press Ctrl+C again to exit.'));
+				console.log(chalk.red('Press Ctrl+C again to exit.'));
 			} else if (key && key.name == 'l') {
 				_this.toggle();
-				console.log(key);
 			} else if (key && key.name == 'c') {
 				_this.copy();
 			}
@@ -33,13 +32,13 @@ class Logger {
 
 	toggle() {
 		this.showLogs = !this.showLogs;
-		console.log(chalk.blue(this.showLogs ? 'Showing Logs...' : 'Hiding logs.'));
+		console.log(chalk.dim(this.showLogs ? 'Showing Logs...' : 'Hiding logs.'));
 	}
 
 	intro(instances) {
 		console.log('');
-		console.log(chalk.bgBlue.white(' ❯❯❯_ '), chalk.bold('Kju v0.3.0'));
-		console.log(chalk.blue(`Loading ${instances} instances...`));
+		console.log(chalk.bgBlack.white(' ❯❯❯_ '), chalk.bold('Kju v0.3.0'));
+		console.log(chalk.dim(`Loading ${instances} instances...`));
 		console.log('');
 	}
 
@@ -63,7 +62,7 @@ class Logger {
 	copy() {
 		this.clipboard.toggle = !this.clipboard.toggle;
 		cp.copy(this.clipboard.toggle ? this.clipboard.gceeqs : this.clipboard.userAgent);
-		console.log(chalk.blue('Copied last', this.clipboard.toggle ? 'HMAC Cookie.' : 'UserAgent.'));
+		console.log(chalk.dim('Copied last', this.clipboard.toggle ? 'HMAC Cookie.' : 'UserAgent.'));
 	}
 
 }
