@@ -17,6 +17,8 @@ const splash = async (instance, config) => {
 	try {
 	
 		let userAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+		let viewportX = Math.floor(400 * (1 + 1.0 * Math.random()));
+		let viewportY = Math.floor(400 * (1 + 0.5 * Math.random()));
 
 		let chrome = new Chrome({
 			timeout: 60000,
@@ -25,7 +27,7 @@ const splash = async (instance, config) => {
 				'disableSync': true,
 				'disable-infobars': true,
 				'disable-web-security': true,
-				'window-size': '400,300',
+				'window-size': `${viewportX},${viewportY}`,
 				'user-agent': userAgent,
 				'user-data-dir': path.resolve('tmp', 'chrome_' + instance),
 				'profile-directory': 'PROFILE_' + instance
@@ -36,7 +38,7 @@ const splash = async (instance, config) => {
 			let captchaClass = await chrome.exists('.g-recaptcha', { wait: false });
 			let captchaId = await chrome.exists('#g-recaptcha', { wait: false });
 			let captchaKey = await chrome.evaluate(() => window.CAPTCHA_KEY);
-			return captchaClass || captchaId || captchaKey;
+			return (captchaClass || captchaId || captchaKey);
 		}
 
 		await chrome.goto('http://www.google.com/404');
@@ -68,7 +70,7 @@ const splash = async (instance, config) => {
 		await fs.outputFile(path.resolve(saveDir, 'ua.txt'), userAgent);
 		await fs.outputFile(path.resolve(saveDir, 'body.png'), await chrome.screenshot('body'));
 
-		logger.success(instance, gceeqs, userAgent)
+		logger.success(instance, gceeqs, userAgent, sitekey)
 
 		notifier.notify({
 			title: '❯❯❯_ Kju',

@@ -1,4 +1,4 @@
-<p align="center"><img width="200" src="media/logo.png" alt="Kju"></p>
+<p align="center"><img width="200" src="media/icon.png" alt="Kju"></p>
 
 > Improved waiting time for the adidas.com splash page.
 
