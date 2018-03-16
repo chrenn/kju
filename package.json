@@ -12,6 +12,7 @@
     "fs-extra": "5.0.0",
     "moment": "2.21.0",
     "navalia": "1.2.0",
-    "node-notifier": "5.2.1"
+    "node-notifier": "5.2.1",
+    "puppeteer": "^1.2.0"
   }
 }
