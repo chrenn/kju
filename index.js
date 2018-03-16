@@ -26,7 +26,10 @@ const splash = async (instance, config) => {
 				'headless': config.headless,
 				'disableSync': true,
 				'disable-infobars': true,
-				'disable-web-security': true,
+				//'disable-web-security': true,
+				'enable-translate-new-ux': true,
+				//'disable-translate-new-ux': true,
+				'no-default-browser-check': true,
 				'window-size': `${viewportX},${viewportY}`,
 				'user-agent': userAgent,
 				'user-data-dir': path.resolve('tmp', 'chrome_' + instance),
@@ -35,10 +38,11 @@ const splash = async (instance, config) => {
 		});
 
 		const thruSplash = async () => {
-			let captchaClass = await chrome.exists('.g-recaptcha', { wait: false });
-			let captchaId = await chrome.exists('#g-recaptcha', { wait: false });
-			let captchaKey = await chrome.evaluate(() => window.CAPTCHA_KEY);
-			return (captchaClass || captchaId || captchaKey);
+			// let captchaClass = await chrome.exists('.g-recaptcha', { wait: false });
+			// let captchaId = await chrome.exists('#g-recaptcha', { wait: false });
+			// let captchaKey = await chrome.evaluate(() => window.CAPTCHA_KEY);
+			// return (captchaClass || captchaId || captchaKey);
+			return await chrome.evaluate(() => typeof grecaptcha !== "undefined");
 		}
 
 		await chrome.goto('http://www.google.com/404');
@@ -70,7 +74,7 @@ const splash = async (instance, config) => {
 		await fs.outputFile(path.resolve(saveDir, 'ua.txt'), userAgent);
 		await fs.outputFile(path.resolve(saveDir, 'body.png'), await chrome.screenshot('body'));
 
-		logger.success(instance, gceeqs, userAgent, sitekey)
+		logger.success(instance, gceeqs, userAgent);
 
 		notifier.notify({
 			title: '❯❯❯_ Kju',

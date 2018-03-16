@@ -51,7 +51,7 @@ class Logger {
 		if (this.showLogs) console.log(chalk.bgRed.white(` Instance ${instance} `), error);
 	}
 
-	success(instance, gceeqs, userAgent, sitekey) {
+	success(instance, gceeqs, userAgent) {
 		this.clipboard.gceeqs = gceeqs;
 		this.clipboard.userAgent = userAgent;
 		console.log(chalk.bgGreen.white(' ❯❯❯_ '), chalk.green(`Through Splash on Instance ${instance}!`), chalk.dim('—'), chalk.dim(moment().format('hh:mm:ss')));
