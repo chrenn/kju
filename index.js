@@ -22,7 +22,7 @@ const splash = async (browser, instance, config) => {
 
 		
 		const page = await browser.newPage();
-		page.setUserAgent(userAgent);
+		//page.setUserAgent(userAgent);
 
 		// let chrome = new Chrome({
 		// 	timeout: 60000,
@@ -90,16 +90,18 @@ const splash = async (browser, instance, config) => {
 
 }
 
-const main = async () => {
-	console.log(puppeteer.defaultArgs());
+const main = async (ix) => {
 	const browser = await puppeteer.launch({
 		headless: false,
 		executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+		userDataDir: path.resolve('tmp', 'chrome_' + ix),
 		args: [
 			'--disable-sync',
 			'--disable-infobars',
 			'--enable-translate-new-ux',
-			'--no-default-browser-check'
+			'--no-default-browser-check',
+			'--profile-directory=PROFILE_' + ix,
+			'--user-agent=' + USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)],
 		]
 	});
 	const page = await browser.newPage();
@@ -111,10 +113,12 @@ const main = async () => {
 		});
 	}
 	await page.close();
-	for (let i = 1; i <= CONFIG.instances; i++) {
+	for (let i = 1; i <= 3; i++) {
 		await utils.timeout(500);
 		splash(browser, i.pad(), CONFIG);
 	}
 }
 
-main();
+for (let i = 1; i <= 10; i++) {
+	main(i);
+}
