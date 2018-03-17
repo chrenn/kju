@@ -1,9 +1,9 @@
 const CONFIG = {
 	splashURL: 'http://www.adidas.com/yeezy',
-	splashURL: 'http://w.www.adidas.de/hmac',
-	instances: 3,
+	//splashURL: 'http://w.www.adidas.de/hmac',
+	instances: 20,
 	headless: false,
-	reload: true,
+	reload: false,
 	timeout: 20
 };
 
