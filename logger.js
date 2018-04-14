@@ -48,7 +48,7 @@ class Logger {
 	}
 
 	error(instance, error) {
-		console.log(chalk.bgRed.white(` Instance ${instance} `), error);
+		if (this.showLogs) console.log(chalk.bgRed.white(` Instance ${instance} `), error);
 	}
 
 	success(instance, gceeqs, userAgent) {

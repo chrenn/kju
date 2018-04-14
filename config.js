@@ -3,7 +3,7 @@ const CONFIG = {
 	//splashURL: 'http://w.www.adidas.de/hmac',
 	instances: 20,
 	headless: false,
-	reload: false,
+	reload: true,
 	timeout: 20
 };
 
