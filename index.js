@@ -32,8 +32,9 @@ const splash = async (instance, config) => {
 			args: [
 				'--disable-sync',
 				'--disable-infobars',
-				//'--enable-translate-new-ux',
+				'--enable-translate-new-ux',
 				'--no-default-browser-check',
+				//'disable-web-security': true,
 				`--user-agent=${userAgent}`,
 				`--window-size=${viewportX},${viewportY}`,
 				`--user-data-dir=${path.resolve('tmp', 'chrome_' + instance)}`,

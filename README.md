@@ -1,6 +1,6 @@
 <p align="center"><img width="200" src="media/icon.png" alt="Kju"></p>
 
-> Kju. Improved waiting time for the adidas.com splash page.
+> ❯❯❯_ Kju – Improved waiting time for the adidas.com splash page.
 
 This is a script for people who don't want to deal with proxies for brute forcing the adidas.com splash page. There are a few similar scripts out there already, but this uses completely separate Chrome sessions for improved results. It is pretty heavy on the CPU though.
 
@@ -39,13 +39,13 @@ This is a script for people who don't want to deal with proxies for brute forcin
 
 # Usage
 
-Start Kju as soon as splash goes live. It handles 20 instances on a 13'' MPB (2016) without problem. Adjust accordingly.
+Start Kju as soon as splash goes live. It handles 20 instances on a 13'' MBP (2016) without problem. Adjust accordingly.
 
 Press `l` to toggle logging in the terminal. Press `c` to copy the latest HMAC and User Agent.
 
 Once an instance passes splash, clicking on the notification takes you to that specific browser window. Cart and checkout from there.
 
-You can also export the HMAC to [InstaCop](https://github.com/bequadro/instacop) on your regular browser. Make sure to set the corresponding User Agent there, e.g. via Chrome's DevTools (Network Conditions) or Safari's developer menu.
+You can also export the HMAC to [InstaCop](https://github.com/bequadro/instacop) on your regular browser. Make sure to set the corresponding User Agent there, e.g. via Chrome's DevTools (network conditions) or Safari's developer menu.
 
 # Support
 
