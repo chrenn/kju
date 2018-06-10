@@ -3,7 +3,6 @@ const fs = require('fs-extra');
 
 const puppeteer = require('puppeteer');
 const notifier = require('node-notifier');
-const retry = require('async-retry');
 
 const Logger = require('./logger');
 const utils = require('./utils');
@@ -12,6 +11,12 @@ const GOOGLE_COOKIES = require('./cookies');
 
 const logger = new Logger();
 logger.intro(CONFIG.instances);
+
+const cleanup = async () => {
+
+	fs.emptyDir(path.resolve('tmp'));
+
+}
 
 const splash = async (instance, config) => {
 
@@ -22,12 +27,12 @@ const splash = async (instance, config) => {
 		let viewportY = Math.floor(400 * (1 + 0.5 * Math.random()));
 
 		const browser = await puppeteer.launch({
-			headless: false,
+			headless: CONFIG.headless,
 			executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
 			args: [
 				'--disable-sync',
 				'--disable-infobars',
-				'--enable-translate-new-ux',
+				//'--enable-translate-new-ux',
 				'--no-default-browser-check',
 				`--user-agent=${userAgent}`,
 				`--window-size=${viewportX},${viewportY}`,
@@ -35,6 +40,7 @@ const splash = async (instance, config) => {
 				`--profile-directory=PROFILE_${instance}`
 			]
 		});
+
 		const cpage = await browser.newPage();
 		await cpage.goto('http://www.google.com/404');
 		for (let cookie of GOOGLE_COOKIES) {
@@ -44,13 +50,17 @@ const splash = async (instance, config) => {
 			});
 		}
 		await cpage.close();
-
 		
 		const page = await browser.newPage().catch(console.log);
 		page.setDefaultNavigationTimeout(60000);
 		
 		await page.goto(config.splashURL);
-		//retry(async () => await page.goto(config.splashURL));
+
+		// await page.setCookie({
+		// 	name: 'HRPYYU',
+		// 	value: 'true',
+		// 	domain: 'www.adidas.de'
+		// })
 
 		while (!(await page.evaluate(() => typeof grecaptcha !== "undefined"))) {
 			logger.info(instance, await page.evaluate(() => document.title));
@@ -59,10 +69,12 @@ const splash = async (instance, config) => {
 		}
 
 		let cookieJar = await page.cookies();
-		let gceeqs = '';
+		let hmacName = '';
+		let hmacVal = '';
 		for (let cookie of cookieJar) {
-			if (cookie.name == 'gceeqs') {
-				gceeqs = cookie.value;
+			if (cookie.value.includes('hmac')) {
+				hmacName = cookie.name;
+				hmacVal = cookie.value;
 			}
 		}
 
@@ -74,7 +86,7 @@ const splash = async (instance, config) => {
 		await fs.outputFile(path.resolve(saveDir, 'ua.txt'), userAgent);
 		await fs.outputFile(path.resolve(saveDir, 'body.png'), await page.screenshot());
 
-		logger.success(instance, gceeqs, userAgent);
+		logger.success(instance, hmacName, hmacVal, userAgent);
 
 		notifier.notify({
 			title: '❯❯❯_ Kju',
@@ -95,11 +107,15 @@ const splash = async (instance, config) => {
 
 }
 
-const main = async (ix) => {
+const main = async () => {
+
+	await cleanup();
+	
 	for (let i = 1; i <= CONFIG.instances; i++) {
 		await utils.timeout(500);
 		splash(i.pad(), CONFIG);
 	}
+
 }
 
 main();
