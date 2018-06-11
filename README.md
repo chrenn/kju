@@ -33,7 +33,7 @@ This is a script for people who don't want to deal with proxies for brute forcin
 
    Open your terminal and `cd` to the `kju` folder. Install the dependencies with `npm install` or `yarn install`.
 
-   In the meantime, log into your Google account on Chrome and export all your cookies with the [EditThisCookie](https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg) extensions into a file called `cookie.json` in the `kju` folder.
+   In the meantime, log into your Google account on Chrome and export all your cookies with the [EditThisCookie](https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg) extensions into a file called `cookies.json` in the `kju` folder.
 
    Open `config.js` and edit it to your liking.
 
