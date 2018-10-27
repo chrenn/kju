@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs-extra');
 
 const puppeteer = require('puppeteer');
+const devices = require('puppeteer/DeviceDescriptors');
 const notifier = require('node-notifier');
 
 const Logger = require('./logger');
@@ -23,39 +24,51 @@ const splash = async (instance, config) => {
 	try {
 
 		let userAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
-		let viewportX = Math.floor(400 * (1 + 1.0 * Math.random()));
-		let viewportY = Math.floor(400 * (1 + 0.5 * Math.random()));
+		let viewportX = Math.floor(1200 * (1 + 0.1 * Math.random()));
+		let viewportY = Math.floor(800 * (1 + 0.1 * Math.random()));
 
 		const browser = await puppeteer.launch({
 			headless: CONFIG.headless,
-			executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+			//executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
 			args: [
+				//'--no-startup-window',
+				//'--start-fullscreen',
+				'--no-default-browser-check',
 				'--disable-sync',
 				'--disable-infobars',
-				'--enable-translate-new-ux',
-				'--no-default-browser-check',
-				//'disable-web-security': true,
+				'--disable-web-security',
+				//'--enable-translate-new-ux',
 				`--user-agent=${userAgent}`,
-				`--window-size=${viewportX},${viewportY}`,
+				//`--window-size=${viewportX},${viewportY}`,
 				`--user-data-dir=${path.resolve('tmp', 'chrome_' + instance)}`,
 				`--profile-directory=PROFILE_${instance}`
 			]
 		});
 
-		const cpage = await browser.newPage();
-		await cpage.goto('http://www.google.com/404');
+		const [ defaultPage ] = await browser.pages();
+		
+		const cookiePage = await browser.newPage();
+		await defaultPage.close();
+		await cookiePage.goto('http://www.google.com/404');
 		for (let cookie of GOOGLE_COOKIES) {
-			await cpage.setCookie({
+			await cookiePage.setCookie({
 				name: cookie.name,
 				value: cookie.value
 			});
 		}
-		await cpage.close();
 		
-		const page = await browser.newPage().catch(console.log);
+		await cookiePage.close();
+		const page = await browser.newPage();
 		page.setDefaultNavigationTimeout(60000);
-		
+		await page.emulate(devices['iPhone 6']);
+		// await page.setViewport({
+		// 	width: viewportX,
+		// 	height: viewportY
+		// });
 		await page.goto(config.splashURL);
+
+
+
 
 		// await page.setCookie({
 		// 	name: 'HRPYYU',
