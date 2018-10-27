@@ -1,6 +1,6 @@
 {
   "name": "kju",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "ADC HMAC Extractor",
   "main": "index.js",
   "author": "bequadro",

@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs-extra');
+const _ = require('lodash');
 
 const puppeteer = require('puppeteer');
 const devices = require('puppeteer/DeviceDescriptors');
@@ -13,42 +14,44 @@ const GOOGLE_COOKIES = require('./cookies');
 const logger = new Logger();
 logger.intro(CONFIG.instances);
 
-const cleanup = async () => {
+const main = async () => {
 
-	fs.emptyDir(path.resolve('tmp'));
+	await fs.emptyDir(path.resolve('tmp'));
+
+	const browser = await puppeteer.launch({
+		headless: CONFIG.headless,
+		//executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+		userDataDir: path.resolve(__dirname, 'tmp/chrome_0'),
+		args: [
+			'--no-default-browser-check',
+			'--disable-sync',
+			'--disable-infobars',
+			'--disable-web-security',
+			'--enable-translate-new-ux',
+			'--window-size=1000,800',
+			'--profile-directory=PROFILE_0',
+			`--disable-extensions-except=${path.resolve(__dirname, 'crx/uBlock0.chromium')}`,
+			`--load-extension=${path.resolve(__dirname, 'crx/uBlock0.chromium')}`
+		]
+	});
+
+	for (let i = 1; i <= CONFIG.instances; i++) {
+		await utils.timeout(1000);
+		splash(browser, i.pad(), CONFIG);
+	}
+
+	const [ defaultPage ] = await browser.pages();
+	await defaultPage.close();
 
 }
 
-const splash = async (instance, config) => {
+const splash = async (browser, instance, config) => {
 
 	try {
 
-		let userAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
-		let viewportX = Math.floor(1200 * (1 + 0.1 * Math.random()));
-		let viewportY = Math.floor(800 * (1 + 0.1 * Math.random()));
-
-		const browser = await puppeteer.launch({
-			headless: CONFIG.headless,
-			//executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-			args: [
-				//'--no-startup-window',
-				//'--start-fullscreen',
-				'--no-default-browser-check',
-				'--disable-sync',
-				'--disable-infobars',
-				'--disable-web-security',
-				//'--enable-translate-new-ux',
-				`--user-agent=${userAgent}`,
-				//`--window-size=${viewportX},${viewportY}`,
-				`--user-data-dir=${path.resolve('tmp', 'chrome_' + instance)}`,
-				`--profile-directory=PROFILE_${instance}`
-			]
-		});
-
-		const [ defaultPage ] = await browser.pages();
+		const context = await browser.createIncognitoBrowserContext();
+		const cookiePage = await context.newPage();
 		
-		const cookiePage = await browser.newPage();
-		await defaultPage.close();
 		await cookiePage.goto('http://www.google.com/404');
 		for (let cookie of GOOGLE_COOKIES) {
 			await cookiePage.setCookie({
@@ -57,18 +60,12 @@ const splash = async (instance, config) => {
 			});
 		}
 		
+		const page = await context.newPage();
 		await cookiePage.close();
-		const page = await browser.newPage();
+
 		page.setDefaultNavigationTimeout(60000);
-		await page.emulate(devices['iPhone 6']);
-		// await page.setViewport({
-		// 	width: viewportX,
-		// 	height: viewportY
-		// });
+		await page.emulate(_.sample(devices));
 		await page.goto(config.splashURL);
-
-
-
 
 		// await page.setCookie({
 		// 	name: 'HRPYYU',
@@ -83,24 +80,24 @@ const splash = async (instance, config) => {
 		}
 
 		let cookieJar = await page.cookies();
-		let hmacName = '';
-		let hmacVal = '';
+		let hmac = {};
 		for (let cookie of cookieJar) {
 			if (cookie.value.includes('hmac')) {
-				hmacName = cookie.name;
-				hmacVal = cookie.value;
+				hmac = cookie;
 			}
 		}
 
-		let saveDir = path.resolve('save', Date.now().toString());
+		let saveDir = path.resolve(__dirname, 'save', Date.now().toString());
 		await fs.ensureDir(saveDir);
+
+		let userAgent = await page.evaluate(() => navigator.userAgent);
 
 		await fs.outputFile(path.resolve(saveDir, 'index.html'), await page.content());
 		await fs.outputFile(path.resolve(saveDir, 'cookies.json'), JSON.stringify(cookieJar));
 		await fs.outputFile(path.resolve(saveDir, 'ua.txt'), userAgent);
 		await fs.outputFile(path.resolve(saveDir, 'body.png'), await page.screenshot());
 
-		logger.success(instance, hmacName, hmacVal, userAgent);
+		logger.success(instance, hmac.name, hmac.value, userAgent);
 
 		notifier.notify({
 			title: '❯❯❯_ Kju',
@@ -117,17 +114,6 @@ const splash = async (instance, config) => {
 
 		logger.error(instance, err);
 
-	}
-
-}
-
-const main = async () => {
-
-	await cleanup();
-	
-	for (let i = 1; i <= CONFIG.instances; i++) {
-		await utils.timeout(500);
-		splash(i.pad(), CONFIG);
 	}
 
 }
