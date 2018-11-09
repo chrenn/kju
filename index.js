@@ -45,6 +45,7 @@ const splash = async (instance, config) => {
 				'--unsafely-treat-insecure-origin-as-secure=http://w.www.adidas.de',
 				'--enable-translate-new-ux',
 				'--window-size=1000,800',
+				`--user-agent=${_.sample(USER_AGENTS)}`,
 				`--profile-directory=PROFILE_${instance}`,
 				`--disable-extensions-except=${path.resolve(__dirname, 'crx/uBlock')},${path.resolve(__dirname, 'crx/ETC')}`,
 				`--load-extension=${path.resolve(__dirname, 'crx/uBlock')},${path.resolve(__dirname, 'crx/ETC')}`
@@ -72,7 +73,12 @@ const splash = async (instance, config) => {
 		await cookiePage.close();
 		
 		page.setDefaultNavigationTimeout(60000);
-		await page.emulate(_.sample(devices));
+		//await page.emulate(_.sample(devices));
+		//await page.setUserAgent(_.sample(USER_AGENTS));
+		await page.setViewport({
+			width: _.random(800, 1000),
+			height: _.random(600, 800)
+		});
 		await page.goto(config.splashURL);
 		
 
@@ -80,7 +86,7 @@ const splash = async (instance, config) => {
 		// 	name: 'HRPYYU',
 		// 	value: 'true',
 		// 	domain: 'www.adidas.de'
-		// })
+		// });
 
 		while (!(await page.evaluate(() => typeof grecaptcha !== 'undefined'))) {
 
