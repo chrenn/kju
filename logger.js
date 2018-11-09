@@ -44,18 +44,18 @@ class Logger {
 		console.log('');
 	}
 
-	info(instance, message) {
-		if (this.showLogs) console.log(chalk.bgBlackBright.white(` Instance ${instance} `), chalk.dim(message));
+	info(instance, tab, message) {
+		if (this.showLogs) console.log(chalk.bgBlackBright.white(` Instance ${instance}_${tab} `), chalk.dim(message));
 	}
 
 	error(instance, error) {
-		if (this.showLogs) console.log(chalk.bgRed.white(` Instance ${instance} `), error);
+		if (this.showLogs) console.log(chalk.bgRed.white(` Instance ${instance}`), error);
 	}
 
-	success(instance, hmacName, hmacVal, userAgent) {
+	success(instance, tab, hmacName, hmacVal, userAgent) {
 		this.clipboard.hmac = hmacVal;
 		this.clipboard.userAgent = userAgent;
-		console.log(chalk.bgGreen.white(' ❯❯❯_ '), chalk.green(`Through Splash on Instance ${instance}!`), chalk.dim('—'), chalk.dim(moment().format('hh:mm:ss')));
+		console.log(chalk.bgGreen.white(' ❯❯❯_ '), chalk.green(`Through Splash on Instance ${instance}_${tab}!`), chalk.dim('—'), chalk.dim(moment().format('hh:mm:ss')));
 		console.log(hmacName ? hmacName + ' — ' + hmacVal : 'Unknown cookie.');
 		console.log(userAgent);
 		console.log('');

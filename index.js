@@ -6,8 +6,8 @@ const puppeteer = require('puppeteer');
 const devices = require('puppeteer/DeviceDescriptors');
 const notifier = require('node-notifier');
 
-const Logger = require('./logger');
 const utils = require('./utils');
+const Logger = require('./logger');
 const { CONFIG, USER_AGENTS } = require('./config');
 const GOOGLE_COOKIES = require('./cookies');
 
@@ -18,39 +18,47 @@ const main = async () => {
 
 	await fs.emptyDir(path.resolve('tmp'));
 
-	const browser = await puppeteer.launch({
-		headless: CONFIG.headless,
-		//executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-		userDataDir: path.resolve(__dirname, 'tmp/chrome_0'),
-		args: [
-			'--no-default-browser-check',
-			'--disable-sync',
-			'--disable-infobars',
-			'--disable-web-security',
-			'--enable-translate-new-ux',
-			'--window-size=1000,800',
-			'--profile-directory=PROFILE_0',
-			`--disable-extensions-except=${path.resolve(__dirname, 'crx/uBlock0.chromium')}`,
-			`--load-extension=${path.resolve(__dirname, 'crx/uBlock0.chromium')}`
-		]
-	});
-
 	for (let i = 1; i <= CONFIG.instances; i++) {
 		await utils.timeout(1000);
-		splash(browser, i.pad(), CONFIG);
+		splash(i.pad(), CONFIG);
 	}
-
-	const [ defaultPage ] = await browser.pages();
-	await defaultPage.close();
 
 }
 
-const splash = async (browser, instance, config) => {
+const splash = async (instance, config) => {
 
 	try {
 
-		const context = await browser.createIncognitoBrowserContext();
-		const cookiePage = await context.newPage();
+		const tab = '00';
+
+		const browser = await puppeteer.launch({
+			headless: false,
+			ignoreHTTPSErrors: true,
+			//executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+			userDataDir: path.resolve('tmp', 'chrome_' + instance),
+			args: [
+				'--no-default-browser-check',
+				'--disable-sync',
+				'--disable-infobars',
+				'--disable-web-security',
+				'--reduce-security-for-testing',
+				'--unsafely-treat-insecure-origin-as-secure=http://w.www.adidas.de',
+				'--enable-translate-new-ux',
+				'--window-size=1000,800',
+				`--profile-directory=PROFILE_${instance}`,
+				`--disable-extensions-except=${path.resolve(__dirname, 'crx/uBlock')},${path.resolve(__dirname, 'crx/ETC')}`,
+				`--load-extension=${path.resolve(__dirname, 'crx/uBlock')},${path.resolve(__dirname, 'crx/ETC')}`
+			]
+		});
+
+		const [defaultPage] = await browser.pages();
+		await defaultPage.close();
+		
+		// const context = await browser.createIncognitoBrowserContext();
+		// const cookiePage = await context.newPage();
+
+		const cookiePage = await browser.newPage();
+		cookiePage.setDefaultNavigationTimeout(60000);
 		
 		await cookiePage.goto('http://www.google.com/404');
 		for (let cookie of GOOGLE_COOKIES) {
@@ -60,12 +68,13 @@ const splash = async (browser, instance, config) => {
 			});
 		}
 		
-		const page = await context.newPage();
+		const page = await browser.newPage();
 		await cookiePage.close();
-
+		
 		page.setDefaultNavigationTimeout(60000);
 		await page.emulate(_.sample(devices));
 		await page.goto(config.splashURL);
+		
 
 		// await page.setCookie({
 		// 	name: 'HRPYYU',
@@ -73,10 +82,22 @@ const splash = async (browser, instance, config) => {
 		// 	domain: 'www.adidas.de'
 		// })
 
-		while (!(await page.evaluate(() => typeof grecaptcha !== "undefined"))) {
-			logger.info(instance, await page.evaluate(() => document.title));
-			await page.waitFor(config.timeout * 1000);
-			if (config.reload) await page.goto(config.splashURL);
+		while (!(await page.evaluate(() => typeof grecaptcha !== 'undefined'))) {
+
+			logger.info(instance, tab, await page.evaluate(() => document.title));
+
+			await page.waitFor(config.timeout * 500);
+			try {
+				await page.hover('.bottom');
+				await page.waitFor(1000);
+				await page.hover('.top');
+			} catch (err) {
+				logger.error(instance, err);
+			};
+			await page.waitFor(config.timeout * 500);
+
+			if (config.reload) await page.reload();
+
 		}
 
 		let cookieJar = await page.cookies();
@@ -97,13 +118,13 @@ const splash = async (browser, instance, config) => {
 		await fs.outputFile(path.resolve(saveDir, 'ua.txt'), userAgent);
 		await fs.outputFile(path.resolve(saveDir, 'body.png'), await page.screenshot());
 
-		logger.success(instance, hmac.name, hmac.value, userAgent);
+		logger.success(instance, tab, hmac.name, hmac.value, userAgent);
 
 		notifier.notify({
 			title: '❯❯❯_ Kju',
 			//icon: path.resolve('media', 'icon.png'),
 			contentImage: path.resolve(saveDir, 'body.png'),
-			message: `Through Splash on Instance ${instance}!`,
+			message: `Through Splash on Instance ${instance}_${tab}!`,
 			sound: 'Hero',
 			timeout: 60000
 		}, async (err, res, data) => {
