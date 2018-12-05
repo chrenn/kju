@@ -79,6 +79,15 @@ const splash = async (instance, config) => {
 			width: _.random(800, 1000),
 			height: _.random(600, 800)
 		});
+
+		await page.setRequestInterception(true);
+		page.on('request', interceptedRequest => {
+			if (interceptedRequest.url().endsWith('_bm/_data'))
+				interceptedRequest.abort();
+			else
+				interceptedRequest.continue();
+		});
+
 		await page.goto(config.splashURL);
 		
 
