@@ -45,7 +45,7 @@ Press `l` to toggle logging in the terminal. Press `c` to copy the latest HMAC a
 
 Once an instance passes splash, clicking on the notification takes you to that specific browser window. Cart and checkout from there.
 
-You can also export the HMAC to [InstaCop](https://github.com/bequadro/instacop) on your regular browser. Make sure to set the corresponding User Agent there, e.g. via Chrome's DevTools (network conditions) or Safari's developer menu.
+You can also export the HMAC to [InstaCop](https://github.com/chrfyi/instacop) on your regular browser. Make sure to set the corresponding User Agent there, e.g. via Chrome's DevTools (network conditions) or Safari's developer menu.
 
 # Support
 
@@ -57,11 +57,3 @@ Try Twitter or [r/adidasATC](https://reddit.com/r/adidasATC).
 
 - [Comprehensive list of Chromium command line switches](https://peter.sh/experiments/chromium-command-line-switches/)
 - [Dynamically updated list of UserAgents](https://techblog.willshouse.com/2012/01/03/most-common-user-agents/)
-
-# Contributing
-
-Someone test this on Windows please.
-
-# Contact
-
-- [bequadro](https://twitter.com/_bequadro)
